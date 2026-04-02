@@ -1,0 +1,13 @@
+{
+  "name": "openhal-9000",
+  "description": "HAL 9000 voice for Claude Code — Claude speaks responses aloud using Piper TTS with the HAL 9000 voice model",
+  "version": "1.0.0",
+  "author": {
+    "name": "Dave Leal",
+    "email": "dave@leallabs.com"
+  },
+  "homepage": "https://github.com/daveleal/claude-plugins",
+  "repository": "https://github.com/daveleal/claude-plugins",
+  "license": "MIT",
+  "keywords": ["tts", "voice", "hal-9000", "piper", "speech"]
+}

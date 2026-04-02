@@ -1,0 +1,16 @@
+{
+  "name": "leal-labs",
+  "description": "Claude Code plugins by Leal Labs",
+  "owner": {
+    "name": "Dave Leal",
+    "email": "dave@leallabs.com"
+  },
+  "plugins": [
+    {
+      "name": "openhal-9000",
+      "description": "HAL 9000 voice for Claude Code — Claude speaks responses aloud using Piper TTS",
+      "source": "./plugins/openhal-9000",
+      "category": "productivity"
+    }
+  ]
+}
