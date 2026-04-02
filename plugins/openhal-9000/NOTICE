@@ -1,0 +1,25 @@
+NOTICE
+
+OpenHAL 9000
+Copyright (c) 2026 Dave Leal / Leal Labs
+
+This project incorporates or depends on the following:
+
+- Piper TTS (MIT License)
+  https://github.com/rhasspy/piper
+  Copyright (c) 2023 Michael Hansen
+
+- Python 3.11 Docker image (PSF License)
+
+- "Daisy Bell" (Harry Dacre, 1892) — Public Domain
+
+- HAL 9000 TTS Voice Model (campwill/HAL-9000-Piper-TTS)
+  https://huggingface.co/campwill/HAL-9000-Piper-TTS
+  License: Not specified by model author. Used by reference only;
+  not redistributed in this repository.
+
+TRADEMARK NOTICE:
+"HAL 9000" and "2001: A Space Odyssey" are properties of their respective
+rights holders. This project is not affiliated with or endorsed by any
+rights holder. Use of these names is for descriptive and interoperability
+purposes and does not imply sponsorship or endorsement.
