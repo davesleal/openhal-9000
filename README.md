@@ -18,7 +18,7 @@ Add to `~/.claude/settings.json`:
     "leal-labs": {
       "source": {
         "source": "github",
-        "repo": "davesleal/claude-plugins"
+        "repo": "davesleal/openhal-9000"
       }
     }
   }

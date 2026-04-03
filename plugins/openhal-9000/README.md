@@ -26,7 +26,7 @@ character. Calm, precise, politely unsettling.
     "leal-labs": {
       "source": {
         "source": "github",
-        "repo": "davesleal/claude-plugins"
+        "repo": "davesleal/openhal-9000"
       }
     }
   }

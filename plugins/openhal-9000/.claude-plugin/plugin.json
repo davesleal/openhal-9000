@@ -6,8 +6,8 @@
     "name": "Dave Leal",
     "email": "dave@leallabs.com"
   },
-  "homepage": "https://github.com/davesleal/claude-plugins",
-  "repository": "https://github.com/davesleal/claude-plugins",
+  "homepage": "https://github.com/davesleal/openhal-9000",
+  "repository": "https://github.com/davesleal/openhal-9000",
   "license": "MIT",
   "keywords": ["tts", "voice", "hal-9000", "piper", "speech"]
 }
