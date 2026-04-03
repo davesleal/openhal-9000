@@ -37,9 +37,9 @@ chmod 700 "$DATA_DIR"
 if [ ! -f "$MODEL_FILE" ] && [ ! -L "$MODEL_FILE" ]; then
   # Check if user already has the model from a previous manual install
   if [ -f "$HOME/.piper/models/hal.onnx" ]; then
-    echo "Found existing HAL model in ~/.piper/models/. Linking it."
-    ln -sf "$HOME/.piper/models/hal.onnx" "$MODEL_FILE"
-    ln -sf "$HOME/.piper/models/hal.onnx.json" "$MODEL_JSON"
+    echo "Found existing HAL model in ~/.piper/models/. Copying it."
+    cp "$HOME/.piper/models/hal.onnx" "$MODEL_FILE"
+    cp "$HOME/.piper/models/hal.onnx.json" "$MODEL_JSON"
   else
     echo "Downloading HAL 9000 voice model (~63MB)..."
     curl -fL --progress-bar -o "$MODEL_FILE" "$MODEL_URL"
