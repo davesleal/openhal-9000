@@ -65,6 +65,9 @@ fi
 echo "Building OpenHAL 9000 Docker image..."
 docker build -t "$IMAGE" "$PLUGIN_ROOT" 2>&1 | tail -3
 
+# --- Symlink speak script ---
+ln -sf "$PLUGIN_ROOT/scripts/hal-speak.sh" "$DATA_DIR/hal-speak.sh"
+
 # --- Create sentinel files ---
 touch "$DATA_DIR/voice-enabled"
 touch "$DATA_DIR/initialized"
