@@ -11,11 +11,17 @@ MARKER_FILE="$DATA_DIR/initialized"
 first_run=false
 if [ ! -f "$MARKER_FILE" ]; then
   first_run=true
-  bash "$PLUGIN_ROOT/scripts/hal-setup.sh" >&2
+  if ! bash "$PLUGIN_ROOT/scripts/hal-setup.sh" >&2; then
+    echo "ERROR: OpenHAL setup failed. Run /hal setup to retry." >&2
+    exit 1
+  fi
 fi
 
-# --- Ensure server is running ---
-bash "$PLUGIN_ROOT/scripts/hal-start.sh" 2>&1 >&2
+# --- Verify Piper is ready ---
+if ! bash "$PLUGIN_ROOT/scripts/hal-start.sh" 2>&1 >&2; then
+  echo "ERROR: Piper verification failed. Run /hal setup to diagnose." >&2
+  exit 1
+fi
 
 # --- First-run greeting ---
 if [ "$first_run" = true ]; then

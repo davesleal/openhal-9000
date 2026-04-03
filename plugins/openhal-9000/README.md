@@ -4,17 +4,31 @@
 
 A Claude Code plugin that gives Claude a voice — specifically, the voice of
 HAL 9000. Claude speaks responses aloud using [Piper TTS](https://github.com/rhasspy/piper)
-with a HAL 9000 voice model, running in a Docker container.
+with a HAL 9000 voice model, running natively on your machine.
 
 HAL doesn't just read text. He editorializes. He summarizes. He stays in
 character. Calm, precise, politely unsettling.
 
 ## Requirements
 
-- **macOS** (uses `afplay` for audio playback)
-- **Docker** ([OrbStack](https://orbstack.dev) recommended, or Docker Desktop)
-- **ffmpeg** (`brew install ffmpeg`)
+- **macOS** on Apple Silicon (M1 or later)
+- **Python 3.10+** (`brew install python` if needed)
 - **Claude Code** (CLI, desktop app, or IDE extension)
+
+That's it. No Docker, no ffmpeg, no external servers.
+
+## System Recommendations
+
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| Chip | Apple M1 | M1 Pro or later |
+| RAM | 8 GB | 16 GB |
+| Disk | ~200 MB (model + venv) | — |
+| macOS | 14 Sonoma | 15 Sequoia or later |
+
+Piper runs inference on the CPU via ONNX Runtime. Apple Silicon handles it
+well — expect ~0.7s synthesis time per sentence on M1 Pro or better.
+Machines with more performance cores will synthesize faster.
 
 ## Installation
 
@@ -36,8 +50,8 @@ character. Calm, precise, politely unsettling.
 2. In Claude Code, run `/plugins` and install **openhal-9000**.
 
 3. Start a new session. On first run, HAL will:
+   - Create a Python virtual environment with Piper TTS
    - Download the voice model (~63MB)
-   - Build the Docker image
    - Sing you a song
    - Introduce himself
 
@@ -50,21 +64,54 @@ character. Calm, precise, politely unsettling.
 | `/hal off` | Disable voice |
 | `/hal say "text"` | Speak text as HAL |
 | `/hal status` | Check system health |
-| `/hal restart` | Restart TTS server |
+| `/hal restart` | Re-verify Piper installation |
 | `/hal setup` | Re-run first-time setup |
 
 ## Configuration
 
 | Env Variable | Default | Description |
 |-------------|---------|-------------|
-| `OPENHAL_PORT` | `9090` | TCP port for the TTS server |
+| `OPENHAL_LENGTH_SCALE` | `0.92` | Speech rate (lower = faster, 1.0 = default) |
 
 ## How It Works
 
-1. A Docker container runs Piper TTS with the HAL 9000 voice model
+1. A Python venv at `~/.openhal-9000/venv` contains Piper TTS and its dependencies
 2. A Claude Code skill instructs Claude to speak at the end of every response
-3. Claude calls `hal-speak.sh` which sends text to the server over TCP
-4. The server synthesizes audio, ffmpeg converts it, afplay plays it
+3. Claude calls `hal-speak.sh` which runs Piper natively to synthesize audio
+4. macOS `afplay` plays the resulting WAV file
+
+No Docker containers, no network servers, no ffmpeg. Just a direct call to
+Piper on Apple Silicon.
+
+## Docker Fallback
+
+If you can't run Piper natively (e.g., Intel Mac, Linux without ONNX Runtime
+support), a Docker-based fallback is included:
+
+1. Install [Docker](https://www.docker.com) or [OrbStack](https://orbstack.dev)
+2. Build the image: `docker build -t openhal-9000-piper /path/to/plugin`
+3. Run the server:
+   ```bash
+   docker run -d --name openhal-9000-server \
+     -p 127.0.0.1:9090:9090 \
+     -v ~/.openhal-9000/models:/models \
+     openhal-9000-piper
+   ```
+
+The Docker server listens on TCP port 9090 and accepts text, returning raw
+s16le audio. This is slower than native (~37% overhead from Docker networking)
+but works on any platform Docker supports.
+
+## Upgrading from Docker
+
+If you previously used the Docker-based version:
+
+1. Update the plugin (it will auto-setup the native venv on next session start)
+2. Optionally clean up the old Docker resources:
+   ```bash
+   docker rm -f openhal-9000-server
+   docker rmi openhal-9000-piper piper-hal-arm
+   ```
 
 ## Disclaimer
 
@@ -85,10 +132,10 @@ the author directly.
 
 ### Security Notice
 
-This plugin runs shell scripts on your machine and starts a local network
-server (bound to localhost only). It downloads a third-party machine learning
-model from HuggingFace. Review the source code before installing. Only
-install from the official repository.
+This plugin runs shell scripts on your machine and creates a local Python
+virtual environment. It downloads a third-party machine learning model from
+HuggingFace. Review the source code before installing. Only install from the
+official repository.
 
 ### Voice Model
 

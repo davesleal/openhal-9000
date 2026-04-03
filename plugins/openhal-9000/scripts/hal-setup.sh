@@ -8,7 +8,7 @@ DATA_DIR="$HOME/.openhal-9000"
 MODEL_DIR="$DATA_DIR/models"
 MODEL_FILE="$MODEL_DIR/hal.onnx"
 MODEL_JSON="$MODEL_DIR/hal.onnx.json"
-IMAGE="openhal-9000-piper"
+VENV_DIR="$DATA_DIR/venv"
 
 # Known-good checksums
 MODEL_SHA256="0e08c82dc027bc72b8b839324801709e205e8c201ccae171b92e37a664d94361"
@@ -19,13 +19,8 @@ MODEL_URL="${HF_BASE}/hal.onnx"
 CONFIG_URL="${HF_BASE}/hal.onnx.json"
 
 # --- Check prerequisites ---
-if ! command -v docker >/dev/null 2>&1; then
-  echo "ERROR: Docker is required. Install OrbStack (https://orbstack.dev) or Docker Desktop." >&2
-  exit 1
-fi
-
-if ! command -v ffmpeg >/dev/null 2>&1; then
-  echo "ERROR: ffmpeg is required. Install with: brew install ffmpeg" >&2
+if ! command -v python3 >/dev/null 2>&1; then
+  echo "ERROR: Python 3 is required. Install with: brew install python" >&2
   exit 1
 fi
 
@@ -42,8 +37,16 @@ if [ ! -f "$MODEL_FILE" ] && [ ! -L "$MODEL_FILE" ]; then
     cp "$HOME/.piper/models/hal.onnx.json" "$MODEL_JSON"
   else
     echo "Downloading HAL 9000 voice model (~63MB)..."
-    curl -fL --progress-bar -o "$MODEL_FILE" "$MODEL_URL"
-    curl -fL --progress-bar -o "$MODEL_JSON" "$CONFIG_URL"
+    if ! curl -fL --progress-bar -o "$MODEL_FILE" "$MODEL_URL"; then
+      echo "ERROR: Failed to download model. Check your internet connection and try /hal setup again." >&2
+      rm -f "$MODEL_FILE"
+      exit 1
+    fi
+    if ! curl -fL --progress-bar -o "$MODEL_JSON" "$CONFIG_URL"; then
+      echo "ERROR: Failed to download model config." >&2
+      rm -f "$MODEL_FILE" "$MODEL_JSON"
+      exit 1
+    fi
   fi
 fi
 
@@ -61,9 +64,12 @@ if command -v shasum >/dev/null 2>&1; then
   fi
 fi
 
-# --- Build Docker image ---
-echo "Building OpenHAL 9000 Docker image..."
-docker build -t "$IMAGE" "$PLUGIN_ROOT" 2>&1 | tail -3
+# --- Create Python venv with Piper TTS ---
+if [ ! -f "$VENV_DIR/bin/piper" ]; then
+  echo "Setting up Piper TTS (native)..."
+  python3 -m venv "$VENV_DIR"
+  "$VENV_DIR/bin/pip" install --quiet piper-tts
+fi
 
 # --- Symlink speak script ---
 ln -sf "$PLUGIN_ROOT/scripts/hal-speak.sh" "$DATA_DIR/hal-speak.sh"
