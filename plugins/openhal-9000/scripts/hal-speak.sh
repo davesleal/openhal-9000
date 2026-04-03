@@ -34,7 +34,9 @@ while True:
     data += chunk
 s.close()
 sys.stdout.buffer.write(data)
-" "$TEXT" 2>/dev/null | ffmpeg -y -f s16le -ar 22050 -ac 1 -i pipe:0 "$TMPWAV" 2>/dev/null || exit 0
+" "$TEXT" 2>/dev/null | ffmpeg -y -f s16le -ar 22050 -ac 1 -i pipe:0 \
+  -af "anlmdn=s=0.01,agate=threshold=0.02:ratio=3:attack=5:release=50,highpass=f=120,lowpass=f=6500,equalizer=f=3500:t=q:w=1:g=-1,compand=points=-80/-80|-20/-20:attacks=0.005:decays=0.1" \
+  -acodec pcm_s16le -ar 22050 "$TMPWAV" 2>/dev/null || exit 0
 
 # Platform-specific playback
 if command -v afplay >/dev/null 2>&1; then
